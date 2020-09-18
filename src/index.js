@@ -206,9 +206,24 @@ export default class Typeahead extends React.Component {
     //   .toString()
     //   .replace(regex, `<span className="bolded">${text}</span>`);
 
-    // if (text) {
-    //   let index = text.toLowerCase().indexOf()
-    // }
+    if (text) {
+      let index = text.toLowerCase().indexOf(text.toLocaleUpperCase());
+      if (index !== -1) {
+        let length = text.length;
+
+        let prefix = text.substring(0, index);
+        let suffix = text.substring(index + length);
+        let match = text.substring(index, index + length);
+
+        return (
+          <span>
+            {prefix}
+            <span className="bolded">{match}</span>
+            {suffix}
+          </span>
+        );
+      }
+    }
     return (
       <ul className="suggestions">
         {suggestions.map((color, i) => (
