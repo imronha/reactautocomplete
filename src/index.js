@@ -152,7 +152,7 @@ const colorsList = [
   "YellowGreen",
 ];
 
-export default class Typeahead extends React.Component {
+class Typeahead extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -174,27 +174,15 @@ export default class Typeahead extends React.Component {
       suggestions = list.sort().filter((color) => regex.test(color));
     }
     this.setState(() => ({ suggestions, text: val }));
-
-    // if (val.length === 0) {
-    //   this.setState(() => ({
-    //     suggestions: [],
-    //   }));
-    // } else {
-    //   // Check if input matches an item from colorlist
-    //   // Set matched item to suggestion state and text value
-    //   const regex = new RegExp(`${val}`, "gi");
-    //   const suggestions = list.sort().filter((color) => regex.test(color));
-    //   this.setState(() => ({ suggestions, text: val }));
-    // }
   };
 
   renderMatchedSuggestions() {
-    // Desctructure
+    // Destructure
     const { suggestions } = this.state;
     const { text } = this.state;
     //console.log({ text, suggestions });
 
-    // If no suggestions, return null (null renders nothing)
+    // If no suggestions, return null
     if (suggestions.length === 0) {
       return null;
     }
@@ -202,37 +190,21 @@ export default class Typeahead extends React.Component {
     // Map through suggestions in state
     // Check for onclick, pass selected suggestion to onInputChanged
     const regex = new RegExp(`${text}`, "gi");
-    // const bolded = suggestions
-    //   .toString()
-    //   .replace(regex, `<span className="bolded">${text}</span>`);
+    const suggestionList = suggestions.map((color, i) => {
+      const bolded = color.toString().replace(regex, "<b>" + text + "</b>");
+      console.log(bolded);
 
-    if (text) {
-      let index = text.toLowerCase().indexOf(text.toLocaleUpperCase());
-      if (index !== -1) {
-        let length = text.length;
-
-        let prefix = text.substring(0, index);
-        let suffix = text.substring(index + length);
-        let match = text.substring(index, index + length);
-
-        return (
-          <span>
-            {prefix}
-            <span className="bolded">{match}</span>
-            {suffix}
-          </span>
-        );
-      }
-    }
-    return (
-      <ul className="suggestions">
-        {suggestions.map((color, i) => (
-          <li key={i} onClick={() => this.suggestionSelected(color)}>
-            {color}
-          </li>
-        ))}
-      </ul>
-    );
+      return (
+        <ul className="suggestions">
+          <li
+            key={i}
+            onClick={() => this.suggestionSelected(color)}
+            dangerouslySetInnerHTML={{ __html: bolded }}
+          ></li>
+        </ul>
+      );
+    });
+    return suggestionList;
   }
 
   suggestionSelected(value) {
@@ -246,7 +218,7 @@ export default class Typeahead extends React.Component {
   render() {
     const { text } = this.state;
     return (
-      <div>
+      <div className="container" ref={this.container}>
         <form className="search-form">
           <input
             value={text}
@@ -260,34 +232,95 @@ export default class Typeahead extends React.Component {
       </div>
     );
   }
+
+  clearSuggestions() {
+    this.setState(() => ({
+      suggestions: [],
+    }));
+  }
+
+  componentDidMount() {
+    document.addEventListener("click", this.clearSuggestions());
+  }
 }
-
-// function Typeahead() {
-//   // function findMatches(wordInput, colorsList) {
-//   //   return colorsList.filter((color) => {
-//   //     // here we need to figure out if the city or state matches what was searched
-//   //     const regex = new RegExp(wordInput, "gi");
-//   //     return color.match(regex);
-//   //   });
-//   // }
-//   // function displaySuggestions() {}
-
-//   return (
-// <div>
-//   {console.log(colorsList)}
-//   <form className="search-form">
-//     <input type="text" className="search" placeholder="Color Search" />
-//     <ul className="suggestions">
-//       {colorsList.map((color, i) => (
-//         <li key={i}> {color}</li>
-//       ))}
-//     </ul>
-//   </form>
-// </div>
-//   );
-// }
 
 ReactDOM.render(
   <Typeahead list={colorsList} />,
   document.getElementById("root")
 );
+
+// console.log(bolded);
+// if (suggestions) {
+// for (let i = 0; i < suggestions.length; i++) {
+//   // console.log(suggestions[i]);
+//   const color = suggestions[i].toLowerCase();
+//   const bolded =
+//     color.slice(0, color.indexOf(text)) +
+//     "<b>" +
+//     text +
+//     "</b>" +
+//     color.slice(color.indexOf(text) + text.length, color.length);
+//   console.log(bolded);
+
+//   return (
+//     <ul className="suggestions">
+//       <li onClick={() => this.suggestionSelected(suggestions[i])}>
+//         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
+//       </li>
+//     </ul>
+//   );
+// }
+
+//   return (
+//     <ul className="suggestions">
+//       {suggestions.map((color, i) => (
+//         <li key={i} onClick={() => this.suggestionSelected(color)}>
+//           {color}
+//         </li>
+//       ))}
+//     </ul>
+//   );
+// }
+
+// return (
+//   <ul className="suggestions">
+//     {suggestions.map((color, i) => (
+//       <li
+//         key={i}
+//         onClick={() => this.suggestionSelected(color)}
+//         dangerouslySetInnerHTML={{ __html: bolded }}
+//       ></li>
+//     ))}
+//   </ul>
+// );
+
+// const bolded =
+//   suggestions.slice(0, suggestions.indexOf(text)) +
+//   "<b>" +
+//   text +
+//   "</b>" +
+//   suggestions.slice(
+//     suggestions.indexOf(text) + text.length,
+//     suggestions.length
+//   );
+// console.log(bolded);
+
+// return (
+//   <ul className="suggestions">
+//     {suggestions.map((color, i) => (
+//       <li key={i} onClick={() => this.suggestionSelected(color)}>
+//         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
+//       </li>
+//     ))}
+//   </ul>
+// );
+
+// return (
+//   <ul className="suggestions">
+//     {suggestions.map((color, i) => (
+//       <li key={i} onClick={() => this.suggestionSelected(color)}>
+//         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
+//       </li>
+//     ))}
+//   </ul>
+// );

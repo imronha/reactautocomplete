@@ -50,8 +50,7 @@ input.search {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.14);
   margin: 0;
   padding: 20px;
-  /* transition: background 0.2s; */
-  display: flex;
+  display: left;
   justify-content: space-between;
   text-transform: capitalize;
 }
