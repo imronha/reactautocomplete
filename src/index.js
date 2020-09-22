@@ -233,17 +233,14 @@ class Typeahead extends React.Component {
     this.setState(() => ({ position: 0, suggestions, text: val }));
   };
 
-  handleSuggestionSelected(value) {
-    // Set text value and reset state when user selects a suggestion
-    this.setState(() => ({
-      text: value,
-      suggestions: [],
-    }));
-  }
-
   handleClick = (e) => {
+    console.log(e);
     if (this.input.current.contains(e.target)) {
-      return;
+      this.setState(() => ({
+        text: e.target.outerText,
+        position: 0,
+        suggestions: [],
+      }));
     }
     this.setState(() => ({
       position: 0,
@@ -272,7 +269,7 @@ class Typeahead extends React.Component {
           <li
             autoFocus
             key={i}
-            onClick={() => this.handleSuggestionSelected(color)}
+            onClick={() => this.handleClick(color)}
             dangerouslySetInnerHTML={{ __html: bolded }}
             className={position === i ? "active" : null}
           ></li>
@@ -292,9 +289,8 @@ class Typeahead extends React.Component {
     const { text } = this.state;
     return (
       <div className="container" onKeyDown={this.handleKeyDown}>
-        <form className="search-form">
+        <form className="search-form" ref={this.input}>
           <input
-            ref={this.input}
             value={text}
             onChange={this.handleInputChange}
             type="text"
@@ -306,15 +302,6 @@ class Typeahead extends React.Component {
       </div>
     );
   }
-
-  // clearSuggestions = (e) => {
-  //   // if (this.container.current && !this.container.current.contains(e.target)) {
-  //   //   this.setState(() => ({
-  //   //     text: "",
-  //   //     suggestions: [],
-  //   //   }));
-  //   // }
-  // };
 }
 
 ReactDOM.render(
