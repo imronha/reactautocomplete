@@ -55,6 +55,11 @@ input.search {
   color: aliceblue;
 }
 
+.suggestions .active {
+  background-color: #0085a1;
+  color: aliceblue;
+}
+
 .bolded {
   font-weight: 900;
   color: green;

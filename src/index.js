@@ -156,10 +156,67 @@ class Typeahead extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      position: 0,
       suggestions: [],
       text: "",
     };
+    this.container = React.createRef();
+    this.input = React.createRef();
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
+
+  handleKeyDown = (e) => {
+    const { position, suggestions } = this.state;
+
+    if (e.keyCode === 9 && position < suggestions.length) {
+      // If tab pressed
+      this.setState((previousState) => ({
+        position: previousState.position + 1,
+      }));
+      this.input.current.focus();
+      e.preventDefault();
+    }
+    // If tab pressed and end of list reached, restart from 0
+    else if (e.keyCode === 9 && position === suggestions.length) {
+      this.setState(() => ({
+        position: 0,
+      }));
+      this.input.current.focus();
+      e.preventDefault();
+    }
+    // If shift+tab pressed, focus previous item
+    if (e.shiftKey && e.keyCode === 9 && position > 0) {
+      this.setState(() => ({
+        position: position - 1,
+      }));
+    }
+    // If shift+tab and at suggestions[0], focus on input
+    else if (e.shiftKey && e.keyCode === 9 && position === 0) {
+      this.setState(() => ({
+        position: 0,
+        suggestions: [],
+      }));
+      e.preventDefault();
+    }
+    if (e.keyCode === 13) {
+      // If Enter pressed
+      this.setState(() => ({
+        position: 0,
+        suggestions: [],
+        text: suggestions[position],
+      }));
+      this.input.current.focus();
+      e.preventDefault();
+    }
+  };
+
+  handleUniversalKeydown = (e) => {
+    if (e.keyCode === 27) {
+      // If ESC pressed
+      this.setState(() => ({ position: 0, suggestions: [] }));
+    }
+  };
 
   handleInputChange = (e) => {
     const { list } = this.props;
@@ -173,7 +230,7 @@ class Typeahead extends React.Component {
       const regex = new RegExp(`${val}`, "gi");
       suggestions = list.sort().filter((color) => regex.test(color));
     }
-    this.setState(() => ({ suggestions, text: val }));
+    this.setState(() => ({ position: 0, suggestions, text: val }));
   };
 
   handleSuggestionSelected(value) {
@@ -184,11 +241,21 @@ class Typeahead extends React.Component {
     }));
   }
 
+  handleClick = (e) => {
+    if (this.input.current.contains(e.target)) {
+      return;
+    }
+    this.setState(() => ({
+      position: 0,
+      suggestions: [],
+    }));
+  };
+
   renderMatchedSuggestions() {
     // Destructure
     const { suggestions } = this.state;
     const { text } = this.state;
-    //console.log({ text, suggestions });
+    const { position } = this.state;
 
     // If no suggestions, return null
     if (suggestions.length === 0) {
@@ -200,14 +267,14 @@ class Typeahead extends React.Component {
     const regex = new RegExp(`${text}`, "gi");
     const suggestionList = suggestions.map((color, i) => {
       const bolded = color.toString().replace(regex, "<b>" + text + "</b>");
-      console.log(bolded);
-
       return (
-        <ul className="suggestions">
+        <ul className="suggestions" key={i}>
           <li
+            autoFocus
             key={i}
             onClick={() => this.handleSuggestionSelected(color)}
             dangerouslySetInnerHTML={{ __html: bolded }}
+            className={position === i ? "active" : null}
           ></li>
         </ul>
       );
@@ -215,12 +282,19 @@ class Typeahead extends React.Component {
     return suggestionList;
   }
 
+  componentDidMount() {
+    this.input.current.focus();
+    document.addEventListener("keydown", this.handleUniversalKeydown);
+    document.addEventListener("mousedown", this.handleClick);
+  }
+
   render() {
     const { text } = this.state;
     return (
-      <div className="container" ref={this.container}>
+      <div className="container" onKeyDown={this.handleKeyDown}>
         <form className="search-form">
           <input
+            ref={this.input}
             value={text}
             onChange={this.handleInputChange}
             type="text"
@@ -241,89 +315,9 @@ class Typeahead extends React.Component {
   //   //   }));
   //   // }
   // };
-
-  // componentDidMount() {
-  //   document.addEventListener("mousedown", this.clearSuggestions);
-  // }
 }
 
 ReactDOM.render(
   <Typeahead list={colorsList} />,
   document.getElementById("root")
 );
-
-// console.log(bolded);
-// if (suggestions) {
-// for (let i = 0; i < suggestions.length; i++) {
-//   // console.log(suggestions[i]);
-//   const color = suggestions[i].toLowerCase();
-//   const bolded =
-//     color.slice(0, color.indexOf(text)) +
-//     "<b>" +
-//     text +
-//     "</b>" +
-//     color.slice(color.indexOf(text) + text.length, color.length);
-//   console.log(bolded);
-
-//   return (
-//     <ul className="suggestions">
-//       <li onClick={() => this.handleSuggestionSelected(suggestions[i])}>
-//         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
-//       </li>
-//     </ul>
-//   );
-// }
-
-//   return (
-//     <ul className="suggestions">
-//       {suggestions.map((color, i) => (
-//         <li key={i} onClick={() => this.handleSuggestionSelected(color)}>
-//           {color}
-//         </li>
-//       ))}
-//     </ul>
-//   );
-// }
-
-// return (
-//   <ul className="suggestions">
-//     {suggestions.map((color, i) => (
-//       <li
-//         key={i}
-//         onClick={() => this.handleSuggestionSelected(color)}
-//         dangerouslySetInnerHTML={{ __html: bolded }}
-//       ></li>
-//     ))}
-//   </ul>
-// );
-
-// const bolded =
-//   suggestions.slice(0, suggestions.indexOf(text)) +
-//   "<b>" +
-//   text +
-//   "</b>" +
-//   suggestions.slice(
-//     suggestions.indexOf(text) + text.length,
-//     suggestions.length
-//   );
-// console.log(bolded);
-
-// return (
-//   <ul className="suggestions">
-//     {suggestions.map((color, i) => (
-//       <li key={i} onClick={() => this.handleSuggestionSelected(color)}>
-//         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
-//       </li>
-//     ))}
-//   </ul>
-// );
-
-// return (
-//   <ul className="suggestions">
-//     {suggestions.map((color, i) => (
-//       <li key={i} onClick={() => this.handleSuggestionSelected(color)}>
-//         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
-//       </li>
-//     ))}
-//   </ul>
-// );
