@@ -161,7 +161,7 @@ class Typeahead extends React.Component {
     };
   }
 
-  onInputChanged = (e) => {
+  handleInputChange = (e) => {
     const { list } = this.props;
     // If nothing is inputted, set state to nothing
     const val = e.target.value;
@@ -176,6 +176,14 @@ class Typeahead extends React.Component {
     this.setState(() => ({ suggestions, text: val }));
   };
 
+  handleSuggestionSelected(value) {
+    // Set text value and reset state when user selects a suggestion
+    this.setState(() => ({
+      text: value,
+      suggestions: [],
+    }));
+  }
+
   renderMatchedSuggestions() {
     // Destructure
     const { suggestions } = this.state;
@@ -188,7 +196,7 @@ class Typeahead extends React.Component {
     }
 
     // Map through suggestions in state
-    // Check for onclick, pass selected suggestion to onInputChanged
+    // Check for onclick, pass selected suggestion to handleInputChange
     const regex = new RegExp(`${text}`, "gi");
     const suggestionList = suggestions.map((color, i) => {
       const bolded = color.toString().replace(regex, "<b>" + text + "</b>");
@@ -198,21 +206,13 @@ class Typeahead extends React.Component {
         <ul className="suggestions">
           <li
             key={i}
-            onClick={() => this.suggestionSelected(color)}
+            onClick={() => this.handleSuggestionSelected(color)}
             dangerouslySetInnerHTML={{ __html: bolded }}
           ></li>
         </ul>
       );
     });
     return suggestionList;
-  }
-
-  suggestionSelected(value) {
-    // Set text value and reset state when user selects a suggestion
-    this.setState(() => ({
-      text: value,
-      suggestions: [],
-    }));
   }
 
   render() {
@@ -222,7 +222,7 @@ class Typeahead extends React.Component {
         <form className="search-form">
           <input
             value={text}
-            onChange={this.onInputChanged}
+            onChange={this.handleInputChange}
             type="text"
             className="search"
             placeholder="Color Search"
@@ -233,15 +233,18 @@ class Typeahead extends React.Component {
     );
   }
 
-  clearSuggestions() {
-    this.setState(() => ({
-      suggestions: [],
-    }));
-  }
+  // clearSuggestions = (e) => {
+  //   // if (this.container.current && !this.container.current.contains(e.target)) {
+  //   //   this.setState(() => ({
+  //   //     text: "",
+  //   //     suggestions: [],
+  //   //   }));
+  //   // }
+  // };
 
-  componentDidMount() {
-    document.addEventListener("click", this.clearSuggestions());
-  }
+  // componentDidMount() {
+  //   document.addEventListener("mousedown", this.clearSuggestions);
+  // }
 }
 
 ReactDOM.render(
@@ -264,7 +267,7 @@ ReactDOM.render(
 
 //   return (
 //     <ul className="suggestions">
-//       <li onClick={() => this.suggestionSelected(suggestions[i])}>
+//       <li onClick={() => this.handleSuggestionSelected(suggestions[i])}>
 //         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
 //       </li>
 //     </ul>
@@ -274,7 +277,7 @@ ReactDOM.render(
 //   return (
 //     <ul className="suggestions">
 //       {suggestions.map((color, i) => (
-//         <li key={i} onClick={() => this.suggestionSelected(color)}>
+//         <li key={i} onClick={() => this.handleSuggestionSelected(color)}>
 //           {color}
 //         </li>
 //       ))}
@@ -287,7 +290,7 @@ ReactDOM.render(
 //     {suggestions.map((color, i) => (
 //       <li
 //         key={i}
-//         onClick={() => this.suggestionSelected(color)}
+//         onClick={() => this.handleSuggestionSelected(color)}
 //         dangerouslySetInnerHTML={{ __html: bolded }}
 //       ></li>
 //     ))}
@@ -308,7 +311,7 @@ ReactDOM.render(
 // return (
 //   <ul className="suggestions">
 //     {suggestions.map((color, i) => (
-//       <li key={i} onClick={() => this.suggestionSelected(color)}>
+//       <li key={i} onClick={() => this.handleSuggestionSelected(color)}>
 //         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
 //       </li>
 //     ))}
@@ -318,7 +321,7 @@ ReactDOM.render(
 // return (
 //   <ul className="suggestions">
 //     {suggestions.map((color, i) => (
-//       <li key={i} onClick={() => this.suggestionSelected(color)}>
+//       <li key={i} onClick={() => this.handleSuggestionSelected(color)}>
 //         <span dangerouslySetInnerHTML={{ __html: bolded }}></span>
 //       </li>
 //     ))}

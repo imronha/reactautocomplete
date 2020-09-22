@@ -25,7 +25,6 @@ input {
 input.search {
   margin: 0;
   text-align: center;
-  /* outline: 0; */
   border: 2px solid #0085a1;
   width: 120%;
   left: -10%;
@@ -34,7 +33,6 @@ input.search {
   z-index: 2;
   border-radius: 10px;
   font-size: 40px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(0, 0, 0, 0.19);
 }
 
 .suggestions {
@@ -47,12 +45,9 @@ input.search {
   background: white;
   list-style: none;
   border-bottom: 1px solid #0085a1;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.14);
-  margin: 0;
+  margin: 5;
   padding: 20px;
   display: left;
-  justify-content: space-between;
-  text-transform: capitalize;
 }
 
 .suggestions li:hover {
